@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import Header from '../../components/Header';
 import Title from '../../components/Title';
 
@@ -7,9 +8,23 @@ import './new.css';
 
 export default function New() {
 
+    const [assunto, setAssunto] = useState('Suporte');
+    const [status, setStatus] = useState('Aberto');
+    const [complemento, setComplemento] = useState('');
+
     function handleRegister(e){
         e.preventDefault();
         alert("teste");
+    }
+
+    //Chama quando troca o assunto
+    function handleChangeSelect(e){
+        setAssunto(e.target.value);
+    }
+
+    //Chamado quando troca o status
+    function handleOptionChange(e){
+        setStatus(e.target.value);
     }
 
     return (
@@ -32,7 +47,7 @@ export default function New() {
                         </select>
 
                         <label>Assunto</label>
-                        <select>
+                        <select value={assunto} onChange={handleChangeSelect}>
                             <option value="Suporte">Suporte</option>
                             <option value="Visita Tecnica">Visita Tecnica</option>
                             <option value="Financeiro">Financeiro</option>
@@ -41,9 +56,11 @@ export default function New() {
                         <label>Assunto</label>
                         <div className='status'>
                             <input 
-                                type="radio"
+                                type="radio" 
                                 name="radio"
                                 value="Aberto"
+                                onChange={handleOptionChange}
+                                checked={ status === 'Aberto' }
                             />
                             <span>Em aberto</span>
 
@@ -51,6 +68,8 @@ export default function New() {
                                 type="radio"
                                 name="radio"
                                 value="Progresso"
+                                onChange={handleOptionChange}
+                                checked={ status === 'Progresso' }
                             />
                             <span>Progersso</span>
 
@@ -58,6 +77,8 @@ export default function New() {
                                 type="radio"
                                 name="radio"
                                 value="Atendido"
+                                onChange={handleOptionChange}
+                                checked={ status === 'Atendido' }
                             />
                             <span>Atendido</span>
                         </div>
@@ -66,6 +87,8 @@ export default function New() {
                         <textarea
                             type="text"
                             placeholder="Descreva seu problema (opcional)"
+                            value={complemento}
+                            onChange={ (e) => setComplemento(e.target.value) }
                         />
                         <button type='submit'>Registrar</button>
                     </form>
