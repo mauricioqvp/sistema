@@ -1,20 +1,85 @@
-import { useState } from 'react';
+import { useState, useEffect, useContext } from 'react';
+
+import firebase from '../../services/firebaseConnection';
 import Header from '../../components/Header';
 import Title from '../../components/Title';
-
-import { FiPlusCircle } from 'react-icons/fi';
+import { AuthContext } from '../../contexts/auth';
+import { toast } from 'react-toastify';
 
 import './new.css';
+import { FiPlusCircle } from 'react-icons/fi';
 
 export default function New() {
+
+    const [loadCustomers, setLoadCustomers] = useState([true]);
+    const [customers, setCustomers] = useState([]);
+    const [customerSelected, setCustomerSelected] = useState(0);
 
     const [assunto, setAssunto] = useState('Suporte');
     const [status, setStatus] = useState('Aberto');
     const [complemento, setComplemento] = useState('');
 
-    function handleRegister(e){
+    const { user } = useContext(AuthContext);
+
+    useEffect(() => {
+        async function loadCustomers(){
+            await firebase.firestore().collection('costumers') //este nome está escrito errado no banco! kkk
+            .get()
+            .then((snapshot)=>{
+                let lista = [];
+
+                snapshot.forEach((doc) => {
+                     lista.push({
+                         id: doc.id,
+                         nomeFantasia: doc.data().nomeFantasia
+                     })
+                })
+
+                if( lista.length === 0){
+                    console.log('NENHUMA EMPRESA ENCONTRADA');
+                    setCustomers([ { id: '1', nomeFantasia: 'FREELA'} ]);
+                    setLoadCustomers(false);
+                    return;
+                }
+
+                setCustomers(lista);
+                setLoadCustomers(false);
+
+            })
+            .catch((error)=>{
+                console.log('DEU ALGUM ERRO! ', error);
+                setLoadCustomers(false);
+                setCustomers([ { id:1, nomeFantasia: '' }]);
+            })
+        }
+
+        loadCustomers();
+
+    }, []);
+
+
+    async function handleRegister(e){
         e.preventDefault();
-        alert("teste");
+        
+        await firebase.firestore().collection('chamados')
+        .add({
+            created: new Date(),
+            cliente: customers[customerSelected].nomeFantasia,
+            clienteId: customers[customerSelected].id,
+            assunto: assunto,
+            status: status,
+            complemento: complemento,
+            userId: user.uid
+        })
+        .then(()=>{
+            toast.success('Chamado criado com sucesso!');
+            setComplemento('');
+            setCustomerSelected(0);
+        })
+        .catch((err)=>{
+            toast.error('Ops erro ao registrar, tente mais tarde.');
+            console.log('Erro ao acrescentar chamados: ', err);
+        })
     }
 
     //Chama quando troca o assunto
@@ -25,6 +90,13 @@ export default function New() {
     //Chamado quando troca o status
     function handleOptionChange(e){
         setStatus(e.target.value);
+    }
+
+    //Chamado quando troca de cliente
+    function handleChangeCustomers(e){
+        //console.log('INDEX DO CLIENTE SELECIONADO: ', e.target.value);
+        //console.log('Cliente selecionado ', customers[e.target.value]);
+        setCustomerSelected(e.target.value);
     }
 
     return (
@@ -40,11 +112,21 @@ export default function New() {
                     <form className='form-profile' onSubmit={handleRegister}>
 
                         <label>Cliente</label>
-                        <select>
-                            <option key={1} value={1}>
-                                Sujeito programador
-                            </option>
-                        </select>
+
+                        {loadCustomers ? (
+                            <input type="text" disabled={true} value="Carregando clientes..." />
+                        ) : (
+                            <select value={customerSelected} onChange={handleChangeCustomers}>
+                            {customers.map((item, index) => {
+                                return(
+                                    <option key={item.id} value={index}>
+                                        {item.nomeFantasia}
+                                    </option>
+                                )
+                            })}
+                            </select>
+                        )}
+
 
                         <label>Assunto</label>
                         <select value={assunto} onChange={handleChangeSelect}>

@@ -42,7 +42,7 @@ export default function Costumers(){
             <Header />
 
             <div className='content'>
-                <Title name="clientes">
+                <Title name="Clientes">
                     <FiUser size={25} />
                 </Title>
 
