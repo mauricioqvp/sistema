@@ -11,25 +11,25 @@ export default function Modal({ conteudo, close }) {
                     Voltar
                 </button>
 
-<div>
                 <div>
-                    <h2>Detalhes do chamado</h2>
+                    <div>
+                        <h2>Detalhes do chamado</h2>
+
+                        <div className='row'>
+                            <span>
+                                Cliente: <i>{conteudo.cliente}</i>
+                            </span>
+                        </div>
+                    </div>
 
                     <div className='row'>
                         <span>
-                            Cliente: <a>{conteudo.cliente}</a>
+                            Assunto: <i>{conteudo.assunto}</i>
+                        </span>
+                        <span>
+                            Cadastrado em: <i>{conteudo.createdFormated}</i>
                         </span>
                     </div>
-                </div>
-
-                <div className='row'>
-                    <span>
-                        Assunto: <a>{conteudo.assunto}</a>
-                    </span>
-                    <span>
-                        Cadastrado em: <a>{conteudo.createdFormated}</a>
-                    </span>
-                </div>
 
 
                     <div className='row'>
@@ -40,13 +40,13 @@ export default function Modal({ conteudo, close }) {
 
                     {conteudo.complemento !== '' && (
                         <>
-                            <h3>Complemento</h3>
+                            <h3>Complemento:</h3>
                             <p>
                                 {conteudo.complemento}
                             </p>
                         </>
                     )}
-                    </div>
+                </div>
             </div>
         </div>
     );
